@@ -66,3 +66,15 @@ class Cache():
     def get_int(self, key: str) -> int:
         """Retrieve data as integer"""
         return self.get(key, int)
+
+
+def replay(val: Cache):
+    """display history of all calls made on a particular function"""
+    clsName = val.__qualname__
+    print(f"""{clsName} was called {
+            val.__self__.get(clsName).decode("utf-8")} times:""")
+    inputs = val.__self__._redis.lrange(f"{clsName}:inputs", 0, -1)
+    outputs = val.__self__._redis.lrange(f"{clsName}:outputs", 0, -1)
+    zipped = zip(inputs, outputs)
+    for i, o in zipped:
+        print(f"""{clsName}(*{i.decode("utf-8")}) -> {o.decode("utf-8")}""")
